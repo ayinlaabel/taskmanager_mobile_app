@@ -7,7 +7,6 @@ export const Container = styled.View`
   display: flex;
   width: 100%;
   height: 100%;
-  padding-top: 40px;
 `;
 
 export const Container50 = styled.View`
@@ -120,7 +119,7 @@ export const LinkText = styled.Text`
 `;
 
 export const ListContainer = styled.View`
-  padding: 10px 20px;
+  padding: 0px 20px;
 `;
 
 export const ListHeader = styled.Text`
@@ -369,20 +368,31 @@ export const TaskContainer = styled.View`
   height: 100%;
 `;
 
-export const TaskHeader = styled.View`
-  height: 100px;
+export const Header = styled.View`
+  height: 90px;
   display: flex;
-  align-items: flex-start;
-  justify-content: flex-end;
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: space-between;
   background-color: #2e2e2e;
-  padding: 20px;
+  padding: 10px 20px;
 `;
 
-export const TaskTitle = styled.Text`
+export const Title = styled.Text`
   font-size: 28px;
   color: white;
 `;
 
 export const TaskListContainer = styled.View`
   padding: 0 20px;
+`;
+
+export const ProfileAvatar = styled.TouchableOpacity`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 30px;
+  width: 30px;
+  border-radius: 500px;
+  border: 1px solid white;
 `;

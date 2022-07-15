@@ -15,13 +15,17 @@ import {
   DeleteIcon,
   EditIcon,
   Divider,
+  Header,
+  Title,
 } from "../styles/styles";
 import { FlatList } from "react-native-gesture-handler";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import { selectToken, selectUser, setList } from "../slices/navSlice";
+import { StatusBar } from "expo-status-bar";
 
 import { useDispatch } from "react-redux";
+import Avatar from "../components/Avatar";
 
 const HomeScreen = ({ navigation }) => {
   const baseUrl = "https://taskmanager001.herokuapp.com/lists/";
@@ -44,11 +48,15 @@ const HomeScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView>
+      <StatusBar style="light" />
       <Container>
+        <Header>
+          <Title>Lists</Title>
+          <Avatar />
+        </Header>
         <ListContainer>
-          <ListHeader>Lists</ListHeader>
           {data < 1 ? (
-            ""
+            <Text>No List</Text>
           ) : (
             <FlatList
               data={data}

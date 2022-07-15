@@ -10,15 +10,17 @@ import {
   List,
   ListText,
   TaskContainer,
-  TaskHeader,
+  Header,
   TaskListContainer,
-  TaskTitle,
+  Title,
 } from "../styles/styles";
 import { FlatList } from "react-native-gesture-handler";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import { selectList, selectToken } from "../slices/navSlice";
 import { Icon } from "@rneui/base";
+import Avatar from "../components/Avatar";
+import { StatusBar } from "expo-status-bar";
 
 const TaskScreen = ({ navigation }) => {
   const baseUrl = "https://taskmanager001.herokuapp.com/lists/";
@@ -38,9 +40,11 @@ const TaskScreen = ({ navigation }) => {
   });
   return (
     <TaskContainer>
-      <TaskHeader>
-        <TaskTitle>Task</TaskTitle>
-      </TaskHeader>
+      <StatusBar style="light" />
+      <Header>
+        <Title>Task</Title>
+        <Avatar />
+      </Header>
       <TaskListContainer>
         {data < 1 ? (
           <Text>No Task</Text>
