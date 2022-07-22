@@ -1,6 +1,6 @@
-import { View, Text, SafeAreaView } from "react-native";
-import React, { useState } from "react";
-import { Icon } from "@rneui/themed";
+import { View, Text, SafeAreaView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Icon } from '@rneui/themed';
 
 import {
   Container,
@@ -17,27 +17,51 @@ import {
   Divider,
   Header,
   Title,
-} from "../styles/styles";
-import { FlatList } from "react-native-gesture-handler";
-import { useSelector } from "react-redux";
-import axios from "axios";
-import { selectToken, selectUser, setList } from "../slices/navSlice";
-import { StatusBar } from "expo-status-bar";
+} from '../styles/styles';
+import { FlatList } from 'react-native-gesture-handler';
+import { useSelector } from 'react-redux';
+import axios from 'axios';
+import { selectToken, selectUser, setList } from '../slices/navSlice';
+import { StatusBar } from 'expo-status-bar';
 
-import { useDispatch } from "react-redux";
-import Avatar from "../components/Avatar";
+import { useDispatch } from 'react-redux';
+import Avatar from '../components/Avatar';
 
 const HomeScreen = ({ navigation }) => {
-  const baseUrl = "https://taskmanager001.herokuapp.com/lists/";
+  const baseUrl = 'https://taskmanager001.herokuapp.com/lists/';
   const user = useSelector(selectUser);
   const token = useSelector(selectToken);
-
-  const dispatch = useDispatch();
-
   const headers = {
     headers: {
-      "x-access-token": token.token,
+      'x-access-token': token.token,
     },
+  };
+
+  const dispatch = useDispatch();
+  useEffect(() => {
+    const interval = setInterval(() => {
+      axios.get(baseUrl, headers).then((lists) => {
+        for (let i = 0; i < lists.data.length; i++) {
+          if (lists.data[i].reminder <= new Date().getTime()) {
+            const item = lists.data[i];
+            console.log(item);
+          } else {
+            console.log(new Date().getTime());
+          }
+        }
+        // console.log(lists.data);
+      });
+    }, 60000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const sendRemind = (item) => {
+    const time = new Date();
+    // console.log('i am a reminder');
+    // console.log(time.getTime());
+    if (item.reminder === time.getTime()) {
+    }
   };
 
   const [data, setData] = useState([]);
@@ -45,7 +69,6 @@ const HomeScreen = ({ navigation }) => {
   axios.get(baseUrl, headers).then((lists) => {
     setData(lists.data);
   });
-
   return (
     <SafeAreaView>
       <StatusBar style="light" />
@@ -72,37 +95,20 @@ const HomeScreen = ({ navigation }) => {
                       dispatch(
                         setList({
                           item,
-                        })
+                        }),
                       );
-                      navigation.navigate("Task");
+                      navigation.navigate('Task');
                     }}
                   >
                     <ListText>{item.title}</ListText>
+                    {sendRemind(item)}
                   </List>
                   <IconButton>
-                    <EditIcon
-                      onPress={() =>
-                        navigation.navigate("Edit", { type: "list", item })
-                      }
-                    >
-                      <Icon
-                        type="font-awesome"
-                        name="edit"
-                        color="#fff"
-                        size={20}
-                      />
+                    <EditIcon onPress={() => navigation.navigate('Edit', { type: 'list', item })}>
+                      <Icon type="font-awesome" name="edit" color="#fff" size={20} />
                     </EditIcon>
-                    <DeleteIcon
-                      onPress={() =>
-                        navigation.navigate("Delete", { item, type: "list" })
-                      }
-                    >
-                      <Icon
-                        type="font-awesome"
-                        name="trash"
-                        color="#fff"
-                        size={20}
-                      />
+                    <DeleteIcon onPress={() => navigation.navigate('Delete', { item, type: 'list' })}>
+                      <Icon type="font-awesome" name="trash" color="#fff" size={20} />
                     </DeleteIcon>
                   </IconButton>
                 </ContainerList>
@@ -110,7 +116,7 @@ const HomeScreen = ({ navigation }) => {
             />
           )}
         </ListContainer>
-        <FloatButton onPress={() => navigation.navigate("CreateList")}>
+        <FloatButton onPress={() => navigation.navigate('CreateList')}>
           <Icon type="font-awesome" name="plus" color="white" />
         </FloatButton>
       </Container>

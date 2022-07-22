@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import { View, TouchableOpacity, Text, SafeAreaView } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import React, { useState } from 'react';
+import { View, TouchableOpacity, Text, SafeAreaView } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import {
   Input,
   FrontLogo,
@@ -22,18 +22,19 @@ import {
   LinkText,
   AccountContainer,
   Link,
-} from "../styles/styles";
-import axios from "axios";
-import { Formik } from "formik";
-import { useDispatch } from "react-redux";
+} from '../styles/styles';
+import { registerIndieID } from 'native-notify';
+import axios from 'axios';
+import { Formik } from 'formik';
+import { useDispatch } from 'react-redux';
 
-import { setUser, setToken } from "../slices/navSlice";
+import { setUser, setToken } from '../slices/navSlice';
 
 const login = (values) => {
-  const baseUrl = "https://taskmanager001.herokuapp.com/users/";
+  const baseUrl = 'https://taskmanager001.herokuapp.com/users/';
   const dispatch = useDispatch();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   console.log(values);
 
@@ -60,40 +61,62 @@ const login = (values) => {
   // }
 };
 
+const registerNotification = async ({ user }) => {
+  // Native Notify Indie Push Registration Code
+  await registerIndieID(`${user._id}`, 3253, 'JwGxE0G7D1o9ovFB6lufdT');
+  // End of Native Notify Code
+};
+
 const LoginScreen = ({ navigation }) => {
-  const baseUrl = "https://taskmanager001.herokuapp.com/users/";
+  const headers = {
+    'Content-Type': 'application/json',
+    Authorization: 'apiKey',
+  };
+  const baseUrl = 'https://taskmanager001.herokuapp.com/users/';
   const dispatch = useDispatch();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   return (
     <SafeAreaView>
       <>
         <Container>
           <LogoContainer>
-            <FrontLogo source={require("./../images/logo_2.png")} />
+            <FrontLogo source={require('./../images/logo_2.png')} />
             <LogoTitle>Task Manager</LogoTitle>
           </LogoContainer>
           <LoginContainer>
             <Formik
-              initialValues={{ email: "", password: "" }}
+              initialValues={{ email: '', password: '' }}
               onSubmit={(values) => {
-                if (values.email != "" && values.password != "") {
+                if (values.email != '' && values.password != '') {
                   axios
-                    .post(baseUrl + "login", { email: values.email, password: values.password })
+                    .post(
+                      baseUrl + 'login',
+                      {
+                        email: values.email,
+                        password: values.password,
+                      },
+                      headers,
+                    )
                     .then((user) => {
-                      console.log({ user: user.data, email, password });
-                      if (user.data.token) {
-                        dispatch(
-                          setUser({
-                            user: user.data.user,
-                          })
-                        );
-                        dispatch(
-                          setToken({
-                            token: user.data.token,
-                          })
-                        );
-                        navigation.navigate("Dashboard");
+                      console.log(user.data);
+                      if (user.data && user.data.status === 'FAILED') {
+                        navigation.navigate('Message', { item: user.data });
+                      } else {
+                        if (user.data.token) {
+                          dispatch(
+                            setUser({
+                              user: user.data.user,
+                            }),
+                          );
+                          dispatch(
+                            setToken({
+                              token: user.data.token,
+                            }),
+                          );
+                          registerNotification({ user: user.data.user });
+                          navigation.navigate('Dashboard');
+                        }
                       }
                     })
                     .catch((err) => console.log(err));
@@ -106,7 +129,7 @@ const LoginScreen = ({ navigation }) => {
                     <InputLabel>Email</InputLabel>
                     <Input
                       placeholder="johndoe@example.com"
-                      onChangeText={props.handleChange("email")}
+                      onChangeText={props.handleChange('email')}
                       value={props.values.email}
                     />
                   </InputContainer>
@@ -115,7 +138,7 @@ const LoginScreen = ({ navigation }) => {
                     <Input
                       placeholder="password"
                       secureTextEntry={true}
-                      onChangeText={props.handleChange("password")}
+                      onChangeText={props.handleChange('password')}
                       value={props.values.password}
                     />
                   </InputContainer>
@@ -132,7 +155,7 @@ const LoginScreen = ({ navigation }) => {
             </BreakLineContainer>
             <AccountContainer>
               <DefaultText>Don't have Account?</DefaultText>
-              <Link onPress={() => navigation.navigate("Signup")}>
+              <Link onPress={() => navigation.navigate('Signup')}>
                 <LinkText>Sign Up</LinkText>
               </Link>
             </AccountContainer>
