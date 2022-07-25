@@ -13,14 +13,29 @@ import {
 } from '../styles/styles';
 import { Icon } from '@rneui/themed';
 
-const MessageScreen = ({ route }) => {
+const MessageScreen = ({ route, message, navigation }) => {
   const item = route.params.item;
+  console.log(item);
+  setTimeout(() => {
+    // navigation.reset({
+    //   index: 0,
+    //   routes: [{ name: 'Login' }],
+    // });
+    navigation.goBack();
+  }, 5000);
   return (
     <SafeAreaView>
       <MessageContainer>
         <EmptyContainer />
         <MessageAlertContainer status={item.status}>
-          <CloseIconContainer>
+          <CloseIconContainer
+            onPress={() => {
+              navigation.reset({
+                index: 0,
+                routes: [{ name: 'Login' }],
+              });
+            }}
+          >
             <Icon type="font-awesome" name="times" size={15} color="#383d41" />
           </CloseIconContainer>
           <MessageContentContainer>

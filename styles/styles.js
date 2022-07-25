@@ -138,6 +138,7 @@ export const ContainerList = styled.View`
 
 export const List = styled.TouchableOpacity`
   height: 40px;
+  width: 80%;
   display: flex;
   justify-content: center;
   padding: 5px 10px;
@@ -147,6 +148,7 @@ export const List = styled.TouchableOpacity`
 
 export const ListText = styled.Text`
   font-size: 16px;
+  ${(props) => (props.item ? 'text-decoration: line-through' : '')}
 `;
 
 export const FloatButton = styled.TouchableOpacity`
@@ -415,6 +417,12 @@ export const ProfileAvatar = styled.TouchableOpacity`
 
 // Message
 
+export const Message = styled.View`
+  position: absolute;
+  top: 0;
+  left: 0;
+`;
+
 export const MessageContainer = styled.View`
   width: 100%;
   height: 100%;
@@ -494,8 +502,8 @@ export const ProfilePage = styled.View`
 
 export const ProfileContainer = styled.View`
   width: 100%;
-  border-top-right-radius: 50px;
-  border-top-left-radius: 50px;
+  border-top-right-radius: 20px;
+  border-top-left-radius: 20px;
   height: 50%;
   background-color: #fff;
 `;
@@ -504,8 +512,8 @@ export const BackgroundImage = styled.Image`
   position: absolute;
   height: 120px;
   width: 100%;
-  border-top-right-radius: 50px;
-  border-top-left-radius: 50px;
+  border-top-right-radius: 20px;
+  border-top-left-radius: 20px;
 `;
 
 export const ProfilePictureContainer = styled.View`
@@ -522,7 +530,7 @@ export const ProfileAvatarContainer = styled.View`
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: -100px;
+  margin-top: -60px;
   height: 150px;
   width: 150px;
   border-radius: 100px;
@@ -584,4 +592,19 @@ export const LogOutButton = styled.TouchableOpacity`
 export const LogOutText = styled.Text`
   font-size: 20px;
   color: #fff;
+`;
+
+export const ReminderContainer = styled.View`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: 30px;
+`;
+
+export const ReminderSwitch = styled.View`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 110px;
 `;

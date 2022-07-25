@@ -38,23 +38,23 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const dispatch = useDispatch();
-  useEffect(() => {
-    const interval = setInterval(() => {
-      axios.get(baseUrl, headers).then((lists) => {
-        for (let i = 0; i < lists.data.length; i++) {
-          if (lists.data[i].reminder <= new Date().getTime()) {
-            const item = lists.data[i];
-            console.log(item);
-          } else {
-            console.log(new Date().getTime());
-          }
-        }
-        // console.log(lists.data);
-      });
-    }, 60000);
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     axios.get(baseUrl, headers).then((lists) => {
+  //       for (let i = 0; i < lists.data.length; i++) {
+  //         if (lists.data[i].reminder <= new Date().getTime()) {
+  //           const item = lists.data[i];
+  //           console.log(item);
+  //         } else {
+  //           console.log(new Date().getTime());
+  //         }
+  //       }
+  //       // console.log(lists.data);
+  //     });
+  //   }, 60000);
 
-    return () => clearInterval(interval);
-  }, []);
+  //   return () => clearInterval(interval);
+  // }, []);
 
   const sendRemind = (item) => {
     const time = new Date();
@@ -66,61 +66,62 @@ const HomeScreen = ({ navigation }) => {
 
   const [data, setData] = useState([]);
 
-  axios.get(baseUrl, headers).then((lists) => {
-    setData(lists.data);
+  useEffect(() => {
+    axios.get(baseUrl, headers).then((lists) => {
+      setData(lists.data);
+    });
+    return;
   });
   return (
-    <SafeAreaView>
+    <Container>
       <StatusBar style="light" />
-      <Container>
-        <Header>
-          <Title>Lists</Title>
-          <Avatar />
-        </Header>
-        <ListContainer>
-          {data < 1 ? (
-            <Text>No List</Text>
-          ) : (
-            <FlatList
-              data={data}
-              showsVerticalScrollIndicator={false}
-              showsHorizontalScrollIndicator={false}
-              keyExtractor={(item) => item._id}
-              ItemSeparatorComponent={() => <Divider />}
-              renderItem={({ item }) => (
-                <ContainerList>
-                  <List
-                    onPress={() => {
-                      dispatch(setList(null));
-                      dispatch(
-                        setList({
-                          item,
-                        }),
-                      );
-                      navigation.navigate('Task');
-                    }}
-                  >
-                    <ListText>{item.title}</ListText>
-                    {sendRemind(item)}
-                  </List>
-                  <IconButton>
-                    <EditIcon onPress={() => navigation.navigate('Edit', { type: 'list', item })}>
-                      <Icon type="font-awesome" name="edit" color="#fff" size={20} />
-                    </EditIcon>
-                    <DeleteIcon onPress={() => navigation.navigate('Delete', { item, type: 'list' })}>
-                      <Icon type="font-awesome" name="trash" color="#fff" size={20} />
-                    </DeleteIcon>
-                  </IconButton>
-                </ContainerList>
-              )}
-            />
-          )}
-        </ListContainer>
-        <FloatButton onPress={() => navigation.navigate('CreateList')}>
-          <Icon type="font-awesome" name="plus" color="white" />
-        </FloatButton>
-      </Container>
-    </SafeAreaView>
+      <Header>
+        <Title>Lists</Title>
+        <Avatar />
+      </Header>
+      <ListContainer>
+        {data < 1 ? (
+          <Text>No List</Text>
+        ) : (
+          <FlatList
+            data={data}
+            showsVerticalScrollIndicator={false}
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={(item) => item._id}
+            ItemSeparatorComponent={() => <Divider />}
+            renderItem={({ item }) => (
+              <ContainerList>
+                <List
+                  onPress={() => {
+                    dispatch(setList(null));
+                    dispatch(
+                      setList({
+                        item,
+                      }),
+                    );
+                    navigation.navigate('Task');
+                  }}
+                >
+                  <ListText>{item.title}</ListText>
+                  {sendRemind(item)}
+                </List>
+                <IconButton>
+                  <EditIcon onPress={() => navigation.navigate('Edit', { type: 'list', item })}>
+                    <Icon type="font-awesome" name="edit" color="#fff" size={20} />
+                  </EditIcon>
+                  <DeleteIcon onPress={() => navigation.navigate('Delete', { item, type: 'list' })}>
+                    <Icon type="font-awesome" name="trash" color="#fff" size={20} />
+                  </DeleteIcon>
+                </IconButton>
+              </ContainerList>
+            )}
+          />
+        )}
+      </ListContainer>
+      <FloatButton onPress={() => navigation.navigate('CreateList')}>
+        <Icon type="font-awesome" name="plus" color="white" />
+      </FloatButton>
+    </Container>
   );
 };
 

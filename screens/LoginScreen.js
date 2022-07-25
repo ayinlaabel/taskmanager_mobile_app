@@ -22,6 +22,7 @@ import {
   LinkText,
   AccountContainer,
   Link,
+  Message,
 } from '../styles/styles';
 import { registerIndieID } from 'native-notify';
 import axios from 'axios';
@@ -29,6 +30,8 @@ import { Formik } from 'formik';
 import { useDispatch } from 'react-redux';
 
 import { setUser, setToken } from '../slices/navSlice';
+import MessageScreen from './MessageScreen';
+import { ScrollView } from 'react-native-gesture-handler';
 
 const login = (values) => {
   const baseUrl = 'https://taskmanager001.herokuapp.com/users/';
@@ -74,94 +77,95 @@ const LoginScreen = ({ navigation }) => {
   };
   const baseUrl = 'https://taskmanager001.herokuapp.com/users/';
   const dispatch = useDispatch();
+  const [message, setMessage] = useState({});
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   return (
     <SafeAreaView>
-      <>
-        <Container>
-          <LogoContainer>
-            <FrontLogo source={require('./../images/logo_2.png')} />
-            <LogoTitle>Task Manager</LogoTitle>
-          </LogoContainer>
-          <LoginContainer>
-            <Formik
-              initialValues={{ email: '', password: '' }}
-              onSubmit={(values) => {
-                if (values.email != '' && values.password != '') {
-                  axios
-                    .post(
-                      baseUrl + 'login',
-                      {
-                        email: values.email,
-                        password: values.password,
-                      },
-                      headers,
-                    )
-                    .then((user) => {
-                      console.log(user.data);
-                      if (user.data && user.data.status === 'FAILED') {
-                        navigation.navigate('Message', { item: user.data });
-                      } else {
-                        if (user.data.token) {
-                          dispatch(
-                            setUser({
-                              user: user.data.user,
-                            }),
-                          );
-                          dispatch(
-                            setToken({
-                              token: user.data.token,
-                            }),
-                          );
-                          registerNotification({ user: user.data.user });
-                          navigation.navigate('Dashboard');
-                        }
+      <Container>
+        <LogoContainer>
+          <FrontLogo source={require('./../images/logo_2.png')} />
+          <LogoTitle>Task Manager</LogoTitle>
+        </LogoContainer>
+        <LoginContainer>
+          <Formik
+            initialValues={{ email: '', password: '' }}
+            onSubmit={(values) => {
+              if (values.email != '' && values.password != '') {
+                axios
+                  .post(
+                    baseUrl + 'login',
+                    {
+                      email: values.email,
+                      password: values.password,
+                    },
+                    headers,
+                  )
+                  .then((user) => {
+                    // console.log(user.data);
+                    if (user.data && user.data.status === 'FAILED') {
+                      navigation.navigate('Message', { item: user.data });
+                      // setMessage(user.data);
+                      // console.log(message.status, user.data);
+                    } else {
+                      if (user.data.token) {
+                        dispatch(
+                          setUser({
+                            user: user.data.user,
+                          }),
+                        );
+                        dispatch(
+                          setToken({
+                            token: user.data.token,
+                          }),
+                        );
+                        registerNotification({ user: user.data.user });
+                        navigation.navigate('Dashboard');
                       }
-                    })
-                    .catch((err) => console.log(err));
-                }
-              }}
-            >
-              {(props) => (
-                <>
-                  <InputContainer>
-                    <InputLabel>Email</InputLabel>
-                    <Input
-                      placeholder="johndoe@example.com"
-                      onChangeText={props.handleChange('email')}
-                      value={props.values.email}
-                    />
-                  </InputContainer>
-                  <InputContainer>
-                    <InputLabel>Password</InputLabel>
-                    <Input
-                      placeholder="password"
-                      secureTextEntry={true}
-                      onChangeText={props.handleChange('password')}
-                      value={props.values.password}
-                    />
-                  </InputContainer>
-                  <LoginButton onPress={props.handleSubmit}>
-                    <BtnText>Login</BtnText>
-                  </LoginButton>
-                </>
-              )}
-            </Formik>
-            <BreakLineContainer>
-              <BreakLine />
-              <BreakLineText>Register</BreakLineText>
-              <BreakLine />
-            </BreakLineContainer>
-            <AccountContainer>
-              <DefaultText>Don't have Account?</DefaultText>
-              <Link onPress={() => navigation.navigate('Signup')}>
-                <LinkText>Sign Up</LinkText>
-              </Link>
-            </AccountContainer>
-          </LoginContainer>
-        </Container>
-      </>
+                    }
+                  })
+                  .catch((err) => console.log(err));
+              }
+            }}
+          >
+            {(props) => (
+              <>
+                <InputContainer>
+                  <InputLabel>Email</InputLabel>
+                  <Input
+                    placeholder="johndoe@example.com"
+                    onChangeText={props.handleChange('email')}
+                    value={props.values.email}
+                  />
+                </InputContainer>
+                <InputContainer>
+                  <InputLabel>Password</InputLabel>
+                  <Input
+                    placeholder="password"
+                    secureTextEntry={true}
+                    onChangeText={props.handleChange('password')}
+                    value={props.values.password}
+                  />
+                </InputContainer>
+                <LoginButton onPress={props.handleSubmit}>
+                  <BtnText>Login</BtnText>
+                </LoginButton>
+              </>
+            )}
+          </Formik>
+          <BreakLineContainer>
+            <BreakLine />
+            <BreakLineText>Register</BreakLineText>
+            <BreakLine />
+          </BreakLineContainer>
+          <AccountContainer>
+            <DefaultText>Don't have Account?</DefaultText>
+            <Link onPress={() => navigation.navigate('Signup')}>
+              <LinkText>Sign Up</LinkText>
+            </Link>
+          </AccountContainer>
+        </LoginContainer>
+      </Container>
     </SafeAreaView>
   );
 };

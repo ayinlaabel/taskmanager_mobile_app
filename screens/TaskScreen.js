@@ -1,5 +1,5 @@
 import { View, Text } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ContainerList,
   DeleteIcon,
@@ -23,7 +23,7 @@ import Avatar from '../components/Avatar';
 import { StatusBar } from 'expo-status-bar';
 
 const TaskScreen = ({ navigation }) => {
-  const baseUrl = "https://taskmanager001.herokuapp.com/lists/";
+  const baseUrl = 'https://taskmanager001.herokuapp.com/lists/';
   const token = useSelector(selectToken);
   const list = useSelector(selectList);
 
@@ -34,10 +34,11 @@ const TaskScreen = ({ navigation }) => {
       'x-access-token': token.token,
     },
   };
-
-  axios.get(baseUrl + list.item._id + '/tasks', headers).then((tasks) => {
-    setData(tasks.data);
-  });
+  useEffect(() => {
+    axios.get(baseUrl + list.item._id + '/tasks', headers).then((tasks) => {
+      setData(tasks.data);
+    });
+  }, []);
   return (
     <TaskContainer>
       <StatusBar style="light" />
@@ -57,17 +58,30 @@ const TaskScreen = ({ navigation }) => {
             ItemSeparatorComponent={() => <Divider />}
             renderItem={({ item }) => (
               <ContainerList>
-                <List>
-                  <ListText>{item.title}</ListText>
+                <List
+                  onPress={() => {
+                    // console.log(item);
+                    axios
+                      .patch(baseUrl + item._listId + '/tasks/' + item._id, { isComplete: !item.isComplete }, headers)
+                      .then((item) => console.log(item.data));
+                  }}
+                >
+                  <ListText item={item.isComplete}>{item.title}</ListText>
                 </List>
-                <IconButton>
-                  <EditIcon onPress={() => navigation.navigate('Edit', { type: 'task', item })}>
-                    <Icon type="font-awesome" name="edit" color="#fff" size={20} />
-                  </EditIcon>
-                  <DeleteIcon onPress={() => navigation.navigate('Delete', { item, type: 'task' })}>
-                    <Icon type="font-awesome" name="trash" color="#fff" size={20} />
-                  </DeleteIcon>
-                </IconButton>
+                {!item.isComplete ? (
+                  <>
+                    <IconButton>
+                      <EditIcon onPress={() => navigation.navigate('Edit', { type: 'task', item })}>
+                        <Icon type="font-awesome" name="edit" color="#fff" size={20} />
+                      </EditIcon>
+                      <DeleteIcon onPress={() => navigation.navigate('Delete', { item, type: 'task' })}>
+                        <Icon type="font-awesome" name="trash" color="#fff" size={20} />
+                      </DeleteIcon>
+                    </IconButton>
+                  </>
+                ) : (
+                  <></>
+                )}
               </ContainerList>
             )}
           />

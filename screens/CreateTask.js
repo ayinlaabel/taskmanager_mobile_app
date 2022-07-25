@@ -50,7 +50,11 @@ const CreateTask = ({ route, navigation }) => {
                   )
                   .then((task) => {
                     console.log(task.data);
-                    navigation.navigate("Task", { item: list });
+                    navigation.reset({
+                      index: 1,
+                      routes:[{name: 'Dashboard'}, {name: 'Task', item: list}]
+                    })
+                    // navigation.navigate("Task", { item: list });
                     resetForm({ values: "" });
                   });
               }

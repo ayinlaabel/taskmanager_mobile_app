@@ -1,4 +1,4 @@
-import { View, Text } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import React from 'react';
 import { useSelector } from 'react-redux';
 import {
@@ -20,12 +20,22 @@ import {
 } from '../styles/styles';
 import { selectUser } from '../slices/navSlice';
 
-const ProfileScreen = () => {
+const ProfileScreen = ({ navigation }) => {
   const user = useSelector(selectUser);
   return (
     <View>
       <ProfilePage>
-        <EmptyContainer />
+        <TouchableOpacity
+          onPress={() => {
+            // navigation.reset({
+            //   index: 0,
+            //   routes: [{ name: 'Dashboard' }],
+            // });
+            navigation.goBack();
+          }}
+        >
+          <EmptyContainer />
+        </TouchableOpacity>
         <ProfileContainer>
           <ProfilePictureContainer>
             <BackgroundImage source={require('../images/sunset.jpg')} resizeMode="cover" />
@@ -38,7 +48,10 @@ const ProfileScreen = () => {
             <ProfileEmail>{user.user.email}</ProfileEmail>
           </ProfileInfo>
           <LogOutButtonContainer>
-            <LogOutButton>
+            <LogOutButton onPress={() => navigation.reset({
+              index: 0,
+              routes: [{name: 'Login'}]
+            })}>
               <LogOutText>Log Out</LogOutText>
             </LogOutButton>
           </LogOutButtonContainer>

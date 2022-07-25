@@ -1,7 +1,8 @@
-import { View, Text, Platform } from 'react-native';
+import { View, Text, Platform, Switch } from 'react-native';
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Icon } from '@rneui/themed';
+import { DatePickerModal } from 'react-native-paper-dates';
 import {
   ButtonText,
   ButtonTextDefault,
@@ -14,17 +15,22 @@ import {
   DefaultButton,
   GroupButton,
   PrimaryButton,
+  ReminderContainer,
+  ReminderSwitch,
 } from '../styles/styles';
 import axios from 'axios';
 import { useDispatch } from 'react-redux';
 import { Formik } from 'formik';
 import { selectToken, setList } from '../slices/navSlice';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { dateGetter, timeGetter } from '../components/formatDateTime';
 
 const CreateList = ({ route, navigation }) => {
   const [date, setDate] = useState(new Date());
+  const [isDate, setIsDate] = useState('');
+  const [isTime, setIsTime] = useState('');
   const [show, setShow] = useState(false);
-  const [reminder, setReminder] = useState('');
+  const [reminder, setReminder] = useState(false);
   const [mode, setMode] = useState('date');
   const baseUrl = 'https://taskmanager001.herokuapp.com/lists/';
   const token = useSelector(selectToken);
@@ -34,30 +40,31 @@ const CreateList = ({ route, navigation }) => {
     },
   };
 
+  const toggleSwitch = () => {
+    setReminder(!reminder);
+    console.log(reminder);
+  };
+
   const getDate = (event, selectedDate) => {
     const dateSet = selectedDate || date;
-    // setShow(Platform.OS === 'ios');
-    let conDate = new Date(dateSet);
-    const isDate = dateSet.getDate() + '/' + dateSet.getMonth() + '/' + dateSet.getFullYear();
+    const isDate = dateGetter(dateSet);
     setDate(dateSet);
+    setIsDate(isDate);
     setMode('time');
-    // console.log(isDate);
-    // console.log(Platform.OS === 'ios');
+    console.log(isDate);
   };
+
   const showMode = (currentMode) => {
-    setShow(true);
+    setShow(!show);
     setMode(currentMode);
   };
 
   const onChange = (event, selectedTime) => {
     const timeSet = selectedTime || date;
 
-    let conTime = new Date(timeSet);
+    const time = timeGetter(timeSet);
     setShow(false);
-    setReminder(conTime.getTime());
-    // console.log(conTime.getTime());
-    // console.log(new Date(conTime.getTime()).toString());
-    // console.log(Platform.OS === 'ios');
+    setIsTime(time);
   };
 
   const dispatch = useDispatch();
@@ -69,18 +76,25 @@ const CreateList = ({ route, navigation }) => {
           <Formik
             initialValues={{ title: '' }}
             onSubmit={(values, { resetForm }) => {
+              console.log({ isDate, isTime });
               if (values.title != '' && reminder != '') {
                 // console.log(reminder);
-                axios.post(baseUrl, { title: values.title, reminder }, headers).then((list) => {
-                  dispatch(setList(null));
-                  dispatch(
-                    setList({
-                      item: list.data,
-                    }),
-                  );
-                  navigation.navigate('CreateTask');
-                  resetForm({ values: '' , setReminder:''});
-                });
+                axios
+                  .post(baseUrl, { title: values.title, reminder, reminderDate: isDate, reminderTime: isTime }, headers)
+                  .then((list) => {
+                    dispatch(setList(null));
+                    dispatch(
+                      setList({
+                        item: list.data,
+                      }),
+                    );
+                    navigation.reset({
+                      index: 1,
+                      routes: [{ name: 'Dashboard' }, { name: 'CreateTask' }],
+                    });
+                    navigation.navigate('CreateTask');
+                    resetForm({ values: '' });
+                  });
               } else {
                 console.log('some field is empty');
               }
@@ -95,31 +109,42 @@ const CreateList = ({ route, navigation }) => {
                     onChangeText={props.handleChange('title')}
                     value={props.values.title}
                   />
-                  <CreateInputIcon onPress={() => showMode('date')}>
-                    <Icon type="ionicon" name="alarm" size={30} />
-                  </CreateInputIcon>
-                  {show && (
-                    <DateTimePicker
-                      testID="dateTimePicker"
-                      value={date}
-                      mode={mode}
-                      is24Hour={true}
-                      display="default"
-                      onChange={getDate}
-                    />
-                  )}
-
-                  {show && mode == 'time' && (
-                    <DateTimePicker
-                      testID="dateTimePicker"
-                      value={date}
-                      mode={mode}
-                      is24Hour={true}
-                      display="default"
-                      onChange={onChange}
-                    />
-                  )}
                 </CreateInputContainer>
+                <ReminderContainer>
+                  <ReminderSwitch>
+                    <Text>Set Reminder</Text>
+                    <Switch onValueChange={toggleSwitch} value={reminder} />
+                  </ReminderSwitch>
+
+                  {reminder ? (
+                    <CreateInputIcon onPress={() => showMode('date')}>
+                      <Icon type="ionicon" name="alarm" size={30} />
+                    </CreateInputIcon>
+                  ) : (
+                    <></>
+                  )}
+                </ReminderContainer>
+                {show && (
+                  <DateTimePicker
+                    testID="dateTimePicker"
+                    value={date}
+                    mode={mode}
+                    is24Hour={true}
+                    display="default"
+                    onChange={getDate}
+                  />
+                )}
+
+                {show && mode === 'time' && (
+                  <DateTimePicker
+                    testID="dateTimePicker"
+                    value={date}
+                    mode={mode}
+                    is24Hour={true}
+                    display="default"
+                    onChange={onChange}
+                  />
+                )}
                 <GroupButton>
                   <DefaultButton onPress={() => navigation.navigate('Dashboard')}>
                     <ButtonTextDefault>Cancel</ButtonTextDefault>
